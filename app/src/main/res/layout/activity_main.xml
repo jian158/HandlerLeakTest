@@ -7,10 +7,21 @@
   tools:context=".MainActivity">
 
   <Button
+    app:layout_constraintBottom_toTopOf="@id/fix"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    android:text="泄漏测试"
+    android:onClick="openLeak"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+  <Button
+    android:id="@+id/fix"
     android:onClick="open"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="打开一个activity"
+    android:text="修复测试"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintLeft_toLeftOf="parent"
     app:layout_constraintRight_toRightOf="parent"
