@@ -12,39 +12,32 @@ import android.widget.Toast;
 
 public class SecondActivity extends AppCompatActivity {
 
-
-  private SoftReference<AvoidLeakHandler> mHandlerSoftReference;
+  private Handler mHandler;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_second);
-    mHandlerSoftReference = new SoftReference<>(new AvoidLeakHandler(this));
-    Handler mHandler = mHandlerSoftReference.get();
-    if (mHandler != null) {
-      mHandler.sendEmptyMessageDelayed(0, 2000);
-    }
+    mHandler = new AvoidLeakHandler(this);
+    mHandler.sendEmptyMessageDelayed(0, 2000);
     Toast.makeText(this, "auto finish 2s after", Toast.LENGTH_SHORT).show();
   }
 
   private static class AvoidLeakHandler extends Handler {
-    private Activity mActivity;
+    private SoftReference<Activity> mReference;
 
     public AvoidLeakHandler(Activity activity) {
-      mActivity = activity;
+      mReference = new SoftReference<>(activity);
     }
 
-    /*
-    * 这种情况软引用,static解决不了,需在onDestroy remove
-    * */
     @Override
     public void handleMessage(Message msg) {
       Log.i("SecondActiviy", "msg:" + msg.what);
       if (msg.what > 10) {
         return;
       }
-      if (msg.what == 0) {
-        mActivity.finish();
+      if (msg.what == 0 && mReference.get() != null) {
+        mReference.get().finish();
       }
       sendEmptyMessageDelayed(msg.what + 1, 1000);
       super.handleMessage(msg);
@@ -55,9 +48,8 @@ public class SecondActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
-    Handler handler=mHandlerSoftReference.get();
-    if(handler!=null){
-       handler.removeCallbacksAndMessages(null);
+    if (mHandler != null) {
+      mHandler.removeCallbacksAndMessages(null);
     }
   }
 }
